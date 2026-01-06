@@ -1,0 +1,609 @@
+openapi: 3.1.0
+info:
+  title: "{{PROJECT_NAME}} API"
+  description: |
+    {{PROJECT_DESCRIPTION}}
+    
+    ## 認証
+    
+    本APIはJWT Bearer認証を使用します。
+    `Authorization: Bearer {token}` ヘッダーを付与してください。
+    
+    ## エラーレスポンス
+    
+    エラー時は以下の形式でレスポンスを返却します。
+    
+    ```json
+    {
+      "error": {
+        "code": "ERROR_CODE",
+        "message": "エラーメッセージ",
+        "details": [],
+        "requestId": "uuid"
+      }
+    }
+    ```
+  version: "{{VERSION}}"
+  contact:
+    name: "{{CONTACT_NAME}}"
+    email: "{{CONTACT_EMAIL}}"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+
+servers:
+  - url: "http://localhost:3000/api/v1"
+    description: "開発環境"
+  - url: "https://staging-api.example.com/api/v1"
+    description: "ステージング環境"
+  - url: "https://api.example.com/api/v1"
+    description: "本番環境"
+
+tags:
+  - name: "{{resource}}"
+    description: "{{RESOURCE_DESCRIPTION}}"
+  - name: "auth"
+    description: "認証関連"
+
+paths:
+  # ============================================
+  # 認証 API
+  # ============================================
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: "ログイン"
+      description: "メールアドレスとパスワードで認証し、JWTトークンを取得します"
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: "認証成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: "トークンリフレッシュ"
+      description: "リフレッシュトークンを使用して新しいアクセストークンを取得します"
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+      responses:
+        "200":
+          description: "トークン更新成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ============================================
+  # {{Resource}} API
+  # ============================================
+  /{{resources}}:
+    get:
+      tags:
+        - "{{resource}}"
+      summary: "{{RESOURCE_NAME}}一覧取得"
+      description: "{{RESOURCE_NAME}}の一覧を取得します。ページネーション、フィルタリング、ソートに対応しています。"
+      operationId: "list{{Resources}}"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/SortParam"
+        - $ref: "#/components/parameters/OrderParam"
+        - name: status
+          in: query
+          description: "ステータスでフィルタリング"
+          schema:
+            type: string
+            enum:
+              - active
+              - inactive
+              - pending
+      responses:
+        "200":
+          description: "取得成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{{Resource}}ListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - "{{resource}}"
+      summary: "{{RESOURCE_NAME}}作成"
+      description: "新しい{{RESOURCE_NAME}}を作成します"
+      operationId: "create{{Resource}}"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Create{{Resource}}Request"
+      responses:
+        "201":
+          description: "作成成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{{Resource}}Response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /{{resources}}/{id}:
+    get:
+      tags:
+        - "{{resource}}"
+      summary: "{{RESOURCE_NAME}}詳細取得"
+      description: "指定したIDの{{RESOURCE_NAME}}詳細を取得します"
+      operationId: "get{{Resource}}"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: "取得成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{{Resource}}Response"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - "{{resource}}"
+      summary: "{{RESOURCE_NAME}}更新"
+      description: "指定したIDの{{RESOURCE_NAME}}を更新します"
+      operationId: "update{{Resource}}"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Update{{Resource}}Request"
+      responses:
+        "200":
+          description: "更新成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{{Resource}}Response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    delete:
+      tags:
+        - "{{resource}}"
+      summary: "{{RESOURCE_NAME}}削除"
+      description: "指定したIDの{{RESOURCE_NAME}}を削除します"
+      operationId: "delete{{Resource}}"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: "削除成功"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+components:
+  # ============================================
+  # セキュリティスキーム
+  # ============================================
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT認証トークン"
+
+  # ============================================
+  # パラメータ
+  # ============================================
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      description: "リソースID"
+      schema:
+        type: string
+        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+    PageParam:
+      name: page
+      in: query
+      description: "ページ番号（1始まり）"
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      description: "1ページあたりの取得件数"
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 20
+
+    SortParam:
+      name: sort
+      in: query
+      description: "ソートフィールド"
+      schema:
+        type: string
+        default: "createdAt"
+        example: "createdAt"
+
+    OrderParam:
+      name: order
+      in: query
+      description: "ソート順"
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: "desc"
+        example: "desc"
+
+  # ============================================
+  # スキーマ
+  # ============================================
+  schemas:
+    # --- 認証 ---
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: "メールアドレス"
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: "パスワード"
+          minLength: 8
+          example: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: "アクセストークン"
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: "リフレッシュトークン"
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        expiresIn:
+          type: integer
+          description: "有効期限（秒）"
+          example: 3600
+        tokenType:
+          type: string
+          description: "トークンタイプ"
+          example: "Bearer"
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: "リフレッシュトークン"
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    # --- {{Resource}} ---
+    {{Resource}}:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "ID"
+          readOnly: true
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        # --- ここにフィールドを追加 ---
+        # {{field_1}}:
+        #   type: string
+        #   description: "{{field_1_desc}}"
+        #   example: "{{field_1_example}}"
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+          description: "ステータス"
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: "作成日時"
+          readOnly: true
+          example: "2024-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "更新日時"
+          readOnly: true
+          example: "2024-01-01T00:00:00Z"
+
+    Create{{Resource}}Request:
+      type: object
+      required:
+        # - {{required_field}}
+      properties:
+        # {{field_1}}:
+        #   type: string
+        #   description: "{{field_1_desc}}"
+        #   minLength: 1
+        #   maxLength: 255
+        #   example: "{{field_1_example}}"
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+          default: "active"
+          description: "ステータス"
+
+    Update{{Resource}}Request:
+      type: object
+      properties:
+        # {{field_1}}:
+        #   type: string
+        #   description: "{{field_1_desc}}"
+        #   minLength: 1
+        #   maxLength: 255
+        #   example: "{{field_1_example}}"
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - pending
+          description: "ステータス"
+
+    {{Resource}}Response:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/{{Resource}}"
+
+    {{Resource}}ListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/{{Resource}}"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    # --- 共通 ---
+    Pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          description: "現在のページ"
+          example: 1
+        totalPages:
+          type: integer
+          description: "総ページ数"
+          example: 10
+        totalItems:
+          type: integer
+          description: "総件数"
+          example: 200
+        itemsPerPage:
+          type: integer
+          description: "1ページあたりの件数"
+          example: 20
+        hasNext:
+          type: boolean
+          description: "次ページの有無"
+          example: true
+        hasPrev:
+          type: boolean
+          description: "前ページの有無"
+          example: false
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: "エラーコード"
+              example: "VAL_001"
+            message:
+              type: string
+              description: "エラーメッセージ"
+              example: "バリデーションエラーが発生しました"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    description: "エラーが発生したフィールド"
+                    example: "email"
+                  reason:
+                    type: string
+                    description: "エラー理由"
+                    example: "format"
+                  message:
+                    type: string
+                    description: "詳細メッセージ"
+                    example: "有効なメールアドレスを入力してください"
+            requestId:
+              type: string
+              format: uuid
+              description: "リクエストID"
+              example: "550e8400-e29b-41d4-a716-446655440000"
+
+  # ============================================
+  # レスポンス
+  # ============================================
+  responses:
+    BadRequest:
+      description: "リクエスト不正"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "BAD_REQUEST"
+              message: "リクエストの形式が正しくありません"
+              requestId: "550e8400-e29b-41d4-a716-446655440000"
+
+    Unauthorized:
+      description: "認証エラー"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "AUTH_001"
+              message: "認証に失敗しました"
+              requestId: "550e8400-e29b-41d4-a716-446655440000"
+
+    Forbidden:
+      description: "認可エラー"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "AUTHZ_001"
+              message: "このリソースへのアクセス権限がありません"
+              requestId: "550e8400-e29b-41d4-a716-446655440000"
+
+    NotFound:
+      description: "リソース未存在"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "RES_001"
+              message: "リソースが見つかりません"
+              requestId: "550e8400-e29b-41d4-a716-446655440000"
+
+    Conflict:
+      description: "競合エラー"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "RES_002"
+              message: "リソースが既に存在するか、競合が発生しました"
+              requestId: "550e8400-e29b-41d4-a716-446655440000"
+
+    ValidationError:
+      description: "バリデーションエラー"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "VAL_001"
+              message: "入力値に誤りがあります"
+              details:
+                - field: "email"
+                  reason: "format"
+                  message: "有効なメールアドレスを入力してください"
+              requestId: "550e8400-e29b-41d4-a716-446655440000"

@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AssumeRoleTrust",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com",
+          "ecs.amazonaws.com",
+          "ecs-tasks.amazonaws.com",
+          "lambda.amazonaws.com",
+          "codepipeline.amazonaws.com",
+          "codebuild.amazonaws.com",
+          "codedeploy.amazonaws.com",
+          "cloudformation.amazonaws.com",
+          "apprunner.amazonaws.com",
+          "events.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
