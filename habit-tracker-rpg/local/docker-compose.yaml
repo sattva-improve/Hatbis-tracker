@@ -1,0 +1,24 @@
+services:
+  localstack:
+    container_name: habit-tracker-localstack
+    image: localstack/localstack:3.0
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # External services port range
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - SERVICES=dynamodb,lambda,apigateway,cognito-idp,iam,logs,s3
+      - LAMBDA_EXECUTOR=docker
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - PERSISTENCE=1
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./init-scripts:/etc/localstack/init/ready.d"
+    networks:
+      - habit-tracker-network
+
+networks:
+  habit-tracker-network:
+    driver: bridge
