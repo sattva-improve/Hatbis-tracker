@@ -21,6 +21,12 @@
 |-------------|------|
 | [GAMIFICATION.md](./GAMIFICATION.md) | ゲーミフィケーションシステム設計書（経験値、レベル、アチーブメント、ジョブ） |
 
+### 認証設定 🆕
+
+| ドキュメント | 説明 |
+|-------------|------|
+| [SSO_SETUP.md](./SSO_SETUP.md) | **SSO（ソーシャルログイン）設定ガイド** - Google/Apple認証の設定方法 |
+
 ### 開発ガイド
 
 | ドキュメント | 説明 |
@@ -42,6 +48,7 @@ docs/
 ├── index.md                    # このファイル
 ├── API_REFERENCE.md            # API リファレンス
 ├── GAMIFICATION.md             # ゲーミフィケーション設計
+├── SSO_SETUP.md                # SSO設定ガイド 🆕
 ├── LOCAL_DEVELOPMENT.md        # ローカル開発ガイド
 ├── openapi.yaml                # OpenAPI 仕様
 └── api-examples/
@@ -57,7 +64,8 @@ docs/
 - [POST /auth/signup - ユーザー登録](./API_REFERENCE.md#post-authsignup---ユーザー登録)
 - [POST /auth/signin - ログイン](./API_REFERENCE.md#post-authsignin---ログイン)
 - [POST /auth/signout - ログアウト](./API_REFERENCE.md#post-authsignout---ログアウト)
-
+- [GET /auth/sso/providers - SSOプロバイダー一覧](./API_REFERENCE.md#get-authssoproviders---ssoプロバイダー一覧) 🆕
+- [GET /auth/sso/callback - SSOコールバック](./API_REFERENCE.md#get-authssocallback---ssoコールバック) 🆕
 ### 習慣管理API
 
 - [GET /habits - 習慣一覧取得](./API_REFERENCE.md#get-habits---習慣一覧取得)

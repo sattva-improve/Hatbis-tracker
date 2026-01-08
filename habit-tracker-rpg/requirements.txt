@@ -13,6 +13,7 @@ email-validator>=2.1.0
 # Utilities
 python-dateutil>=2.8.0
 ulid-py>=1.1.0
+requests>=2.31.0
 
 # Testing
 pytest>=7.4.0

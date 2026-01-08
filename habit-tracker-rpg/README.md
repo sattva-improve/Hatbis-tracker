@@ -9,6 +9,9 @@ Habit Tracker RPGは、日々の習慣をRPGのような体験に変換するア
 ### 主な機能
 
 - 🔐 **ユーザー認証**: Amazon Cognito による JWT 認証
+  - 📧 メール+パスワード認証
+  - 🔵 **Google SSO** (ソーシャルログイン)
+  - 🍎 **Apple Sign-In** (ソーシャルログイン)
 - 📝 **習慣管理**: 習慣の作成・編集・削除・アーカイブ
 - 📊 **記録管理**: 日々の習慣達成記録
 - ⚔️ **RPGシステム**:
@@ -143,6 +146,14 @@ pytest tests/test_gamification.py -v
 | POST | `/auth/signout` | ログアウト |
 | POST | `/auth/refresh` | トークンリフレッシュ |
 | POST | `/auth/change-password` | パスワード変更 |
+
+### SSO (ソーシャルログイン) 🆕
+
+| メソッド | パス | 説明 |
+|---------|------|------|
+| GET | `/auth/sso/providers` | SSOプロバイダー一覧取得 |
+| GET | `/auth/sso/callback` | OAuthコールバック |
+| GET | `/auth/me` | 現在のユーザー情報取得 |
 
 ### ユーザー
 

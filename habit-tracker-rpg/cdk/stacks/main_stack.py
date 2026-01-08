@@ -156,7 +156,7 @@ class HabitTrackerRpgStack(Stack):
         return tables
 
     def _create_cognito(self):
-        """Create Cognito User Pool."""
+        """Create Cognito User Pool with SSO support."""
         user_pool = cognito.UserPool(
             self,
             "UserPool",
@@ -170,6 +170,7 @@ class HabitTrackerRpgStack(Stack):
             custom_attributes={
                 "display_name": cognito.StringAttribute(mutable=True),
                 "timezone": cognito.StringAttribute(mutable=True),
+                "auth_provider": cognito.StringAttribute(mutable=True),
             },
             password_policy=cognito.PasswordPolicy(
                 min_length=8,
@@ -182,6 +183,62 @@ class HabitTrackerRpgStack(Stack):
             removal_policy=RemovalPolicy.DESTROY if self.env_name == "dev" else RemovalPolicy.RETAIN,
         )
 
+        # Add Cognito Domain for Hosted UI
+        domain = user_pool.add_domain(
+            "CognitoDomain",
+            cognito_domain=cognito.CognitoDomainOptions(
+                domain_prefix=f"{self.prefix}-auth"
+            )
+        )
+
+        # Google Identity Provider (configure with actual credentials in production)
+        google_provider = cognito.UserPoolIdentityProviderGoogle(
+            self,
+            "GoogleProvider",
+            user_pool=user_pool,
+            client_id="GOOGLE_CLIENT_ID_PLACEHOLDER",  # Replace with actual Google OAuth Client ID
+            client_secret="GOOGLE_CLIENT_SECRET_PLACEHOLDER",  # Replace with actual Google OAuth Client Secret
+            scopes=["profile", "email", "openid"],
+            attribute_mapping=cognito.AttributeMapping(
+                email=cognito.ProviderAttribute.GOOGLE_EMAIL,
+                given_name=cognito.ProviderAttribute.GOOGLE_GIVEN_NAME,
+                family_name=cognito.ProviderAttribute.GOOGLE_FAMILY_NAME,
+                profile_picture=cognito.ProviderAttribute.GOOGLE_PICTURE,
+                custom={
+                    "display_name": cognito.ProviderAttribute.GOOGLE_NAME,
+                },
+            ),
+        )
+
+        # Apple Identity Provider (configure with actual credentials in production)
+        apple_provider = cognito.UserPoolIdentityProviderApple(
+            self,
+            "AppleProvider",
+            user_pool=user_pool,
+            client_id="APPLE_CLIENT_ID_PLACEHOLDER",  # Replace with actual Apple Services ID
+            team_id="APPLE_TEAM_ID_PLACEHOLDER",  # Replace with actual Apple Team ID
+            key_id="APPLE_KEY_ID_PLACEHOLDER",  # Replace with actual Apple Key ID
+            private_key="APPLE_PRIVATE_KEY_PLACEHOLDER",  # Replace with actual Apple Private Key
+            scopes=["email", "name"],
+            attribute_mapping=cognito.AttributeMapping(
+                email=cognito.ProviderAttribute.APPLE_EMAIL,
+                given_name=cognito.ProviderAttribute.APPLE_FIRST_NAME,
+                family_name=cognito.ProviderAttribute.APPLE_LAST_NAME,
+            ),
+        )
+
+        # Callback URLs for OAuth
+        callback_urls = [
+            "http://localhost:3000/auth/callback",  # Local development
+            f"https://{self.prefix}.example.com/auth/callback",  # Production (update domain)
+        ]
+        
+        logout_urls = [
+            "http://localhost:3000/",
+            f"https://{self.prefix}.example.com/",
+        ]
+
+        # User Pool Client with OAuth support
         user_pool_client = user_pool.add_client(
             "UserPoolClient",
             user_pool_client_name=f"{self.prefix}-client",
@@ -189,10 +246,36 @@ class HabitTrackerRpgStack(Stack):
                 user_password=True,
                 user_srp=True,
             ),
+            o_auth=cognito.OAuthSettings(
+                flows=cognito.OAuthFlows(
+                    authorization_code_grant=True,
+                    implicit_code_grant=True,
+                ),
+                scopes=[
+                    cognito.OAuthScope.EMAIL,
+                    cognito.OAuthScope.OPENID,
+                    cognito.OAuthScope.PROFILE,
+                ],
+                callback_urls=callback_urls,
+                logout_urls=logout_urls,
+            ),
+            supported_identity_providers=[
+                cognito.UserPoolClientIdentityProvider.COGNITO,
+                cognito.UserPoolClientIdentityProvider.GOOGLE,
+                cognito.UserPoolClientIdentityProvider.APPLE,
+            ],
             generate_secret=False,
             access_token_validity=Duration.hours(1),
             refresh_token_validity=Duration.days(30),
+            id_token_validity=Duration.hours(1),
         )
+
+        # Ensure IdPs are created before client
+        user_pool_client.node.add_dependency(google_provider)
+        user_pool_client.node.add_dependency(apple_provider)
+
+        # Store domain for outputs
+        self.cognito_domain = domain
 
         return user_pool, user_pool_client
 
@@ -221,6 +304,7 @@ class HabitTrackerRpgStack(Stack):
             "COGNITO_USER_POOL_ID": self.user_pool.user_pool_id,
             "COGNITO_CLIENT_ID": self.user_pool_client.user_pool_client_id,
             "COGNITO_REGION": self.region,
+            "COGNITO_DOMAIN": f"{self.prefix}-auth",  # SSO Domain
         }
 
         # Lambda execution role
@@ -252,12 +336,16 @@ class HabitTrackerRpgStack(Stack):
 
         # Handler mapping
         handlers = {
-            # Auth
+            # Auth (Traditional)
             "auth_signup": "src.handlers.auth.sign_up",
             "auth_signin": "src.handlers.auth.sign_in",
             "auth_signout": "src.handlers.auth.sign_out",
             "auth_refresh": "src.handlers.auth.refresh_token",
             "auth_change_password": "src.handlers.auth.change_password",
+            # Auth (SSO)
+            "auth_sso_providers": "src.handlers.auth.get_sso_login_url",
+            "auth_sso_callback": "src.handlers.auth.sso_callback",
+            "auth_user_info": "src.handlers.auth.get_user_info",
             # Users
             "users_get_profile": "src.handlers.users.get_my_profile",
             "users_update_profile": "src.handlers.users.update_my_profile",
@@ -351,6 +439,17 @@ class HabitTrackerRpgStack(Stack):
         auth.add_resource("password").add_resource("change").add_method(
             "POST",
             create_integration("auth_change_password"),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
+        
+        # SSO endpoints (no auth required for initial login)
+        sso = auth.add_resource("sso")
+        sso.add_resource("providers").add_method("GET", create_integration("auth_sso_providers"))
+        sso.add_resource("callback").add_method("GET", create_integration("auth_sso_callback"))
+        auth.add_resource("me").add_method(
+            "GET",
+            create_integration("auth_user_info"),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
@@ -515,6 +614,7 @@ class HabitTrackerRpgStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
+
         return api
 
     def _create_outputs(self):
@@ -538,4 +638,26 @@ class HabitTrackerRpgStack(Stack):
             "UserPoolClientId",
             value=self.user_pool_client.user_pool_client_id,
             description="Cognito User Pool Client ID",
+        )
+
+        # SSO関連のOutputs
+        CfnOutput(
+            self,
+            "CognitoDomainUrl",
+            value=self.cognito_domain.base_url(),
+            description="Cognito Hosted UI Domain URL",
+        )
+
+        CfnOutput(
+            self,
+            "GoogleLoginUrl",
+            value=f"{self.cognito_domain.base_url()}/oauth2/authorize?identity_provider=Google&redirect_uri=http://localhost:3000/auth/callback&response_type=code&client_id={self.user_pool_client.user_pool_client_id}&scope=email+openid+profile",
+            description="Google SSO Login URL",
+        )
+
+        CfnOutput(
+            self,
+            "AppleLoginUrl",
+            value=f"{self.cognito_domain.base_url()}/oauth2/authorize?identity_provider=SignInWithApple&redirect_uri=http://localhost:3000/auth/callback&response_type=code&client_id={self.user_pool_client.user_pool_client_id}&scope=email+openid+profile",
+            description="Apple SSO Login URL",
         )

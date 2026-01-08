@@ -182,6 +182,108 @@ Authorization: Bearer {access_token}
 
 ---
 
+## SSO (ソーシャルログイン) 🆕
+
+### GET /auth/sso/providers - SSOプロバイダー一覧
+
+利用可能なSSOプロバイダーとログインURLを取得します。
+
+**クエリパラメータ:**
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|-----|------|------|
+| redirect_uri | string | No | コールバックURL（デフォルト: http://localhost:3000/auth/callback） |
+
+**レスポンス (200 OK):**
+```json
+{
+  "providers": {
+    "google": {
+      "name": "Google",
+      "icon": "🔵",
+      "login_url": "https://habit-tracker-rpg-dev-auth.auth.ap-northeast-1.amazoncognito.com/oauth2/authorize?identity_provider=Google&client_id=xxx&redirect_uri=http://localhost:3000/auth/callback&response_type=code&scope=email+openid+profile"
+    },
+    "apple": {
+      "name": "Apple",
+      "icon": "🍎",
+      "login_url": "https://habit-tracker-rpg-dev-auth.auth.ap-northeast-1.amazoncognito.com/oauth2/authorize?identity_provider=SignInWithApple&client_id=xxx&redirect_uri=http://localhost:3000/auth/callback&response_type=code&scope=email+openid+profile"
+    }
+  },
+  "cognito_hosted_ui": "https://habit-tracker-rpg-dev-auth.auth.ap-northeast-1.amazoncognito.com/login?client_id=xxx&redirect_uri=http://localhost:3000/auth/callback&response_type=code&scope=email+openid+profile"
+}
+```
+
+### GET /auth/sso/callback - SSOコールバック
+
+OAuth認可コードをトークンに交換します。通常はCognito Hosted UIからリダイレクトで呼び出されます。
+
+**クエリパラメータ:**
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|-----|------|------|
+| code | string | Yes | 認可コード |
+| redirect_uri | string | No | 元のリダイレクトURI |
+
+**レスポンス (200 OK):**
+```json
+{
+  "access_token": "eyJraWQiOi...",
+  "id_token": "eyJraWQiOi...",
+  "refresh_token": "eyJjdHkiOi...",
+  "expires_in": 3600,
+  "token_type": "Bearer",
+  "user": {
+    "user_id": "google_123456789012345678901",
+    "email": "user@gmail.com",
+    "display_name": "User Name",
+    "auth_provider": "Google"
+  }
+}
+```
+
+**エラーレスポンス (400 Bad Request):**
+```json
+{
+  "error": {
+    "code": "SSO_ERROR",
+    "message": "認証がキャンセルされました"
+  }
+}
+```
+
+### GET /auth/me - 現在のユーザー情報
+
+アクセストークンから現在のユーザー情報を取得します。
+
+**ヘッダー:**
+```
+Authorization: Bearer {access_token}
+```
+
+**レスポンス (200 OK):**
+```json
+{
+  "user_id": "google_123456789012345678901",
+  "email": "user@gmail.com",
+  "display_name": "User Name",
+  "timezone": "Asia/Tokyo",
+  "email_verified": true,
+  "user_data": {
+    "user_id": "google_123456789012345678901",
+    "level": 5,
+    "total_exp": 450,
+    "stats": {
+      "vitality": 3,
+      "intelligence": 2,
+      "mental": 4,
+      "dexterity": 1,
+      "charisma": 2,
+      "strength": 3
+    }
+  }
+}
+```
+
+---
+
 ## ユーザー (Users)
 
 ### GET /users/me - 自分のプロフィール取得
