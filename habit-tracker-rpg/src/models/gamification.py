@@ -16,19 +16,31 @@ class StatType(str, Enum):
 
 
 class LevelConfig(BaseModel):
-    """Configuration for level calculation."""
+    """Configuration for level calculation.
+    
+    60日でカンスト（レベル99到達）を目指す設計:
+    - 1日3習慣（Normal）を60日連続達成で約2,700 EXP獲得
+    - レベル99到達に必要な累計EXP: 約2,700 EXP
+    - 序盤は素早く成長、後半は緩やかに
+    """
     
     # Base EXP required for level 2
-    base_exp: int = Field(default=100)
+    base_exp: int = Field(default=15)
     
-    # Growth rate per level (exponential)
-    growth_rate: float = Field(default=1.5)
+    # Growth rate per level (linear growth for balanced progression)
+    growth_rate: float = Field(default=1.02)
     
     # Maximum level
     max_level: int = Field(default=99)
     
     def exp_for_level(self, level: int) -> int:
-        """Calculate total EXP required for a specific level."""
+        """Calculate total EXP required for a specific level.
+        
+        60日カンスト設計:
+        - レベル1→2: 15 EXP
+        - レベル50: 約1,000 EXP
+        - レベル99: 約2,700 EXP
+        """
         if level <= 1:
             return 0
         total = 0
@@ -80,10 +92,16 @@ class StreakBonus(BaseModel):
 
 
 class ExpGain(BaseModel):
-    """Experience gain configuration."""
+    """Experience gain configuration.
+    
+    60日カンスト設計の基本EXP:
+    - 基本EXP: 15
+    - 1日3習慣 × Normal(1.0) = 45 EXP/日（ストリーク無し）
+    - ストリーク30日以上で 45 × 2.0 = 90 EXP/日
+    """
     
     # Base EXP for completing a habit
-    base_exp: int = Field(default=10)
+    base_exp: int = Field(default=15)
     
     # Bonus for difficulty
     difficulty_multipliers: Dict[str, float] = Field(default={
