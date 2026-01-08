@@ -14,6 +14,25 @@ info:
     
     ## 認証
     Amazon Cognito JWT認証を使用
+    
+    すべてのAPI（`/auth/*` を除く）は認証が必要です。
+    リクエストヘッダーに `Authorization: Bearer {access_token}` を含めてください。
+    
+    ## ステータスシステム
+    | ステータス | 略称 | 関連カテゴリ |
+    |-----------|------|--------------|
+    | 体力 (Vitality) | VIT | 運動、睡眠、健康 |
+    | 知力 (Intelligence) | INT | 読書、勉強、学習 |
+    | 精神 (Mental) | MND | 瞑想、日記、感謝、マインドフルネス |
+    | 器用 (Dexterity) | DEX | 音楽、アート、クラフト、趣味 |
+    | 魅力 (Charisma) | CHA | コミュニケーション、社交、身だしなみ |
+    | 筋力 (Strength) | STR | 筋トレ、スポーツ、フィットネス |
+    
+    ## 経験値・レベルシステム
+    - 基本経験値: 10 EXP
+    - 難易度ボーナス: Easy(0.5x), Normal(1.0x), Hard(1.5x), VeryHard(2.0x)
+    - ストリークボーナス: 3日(1.1x), 7日(1.25x), 14日(1.5x), 30日(2.0x)
+    - レベルアップ計算: 必要EXP = 100 × (1.5 ^ (level - 1))
   version: 1.0.0
   contact:
     name: API Support
@@ -57,6 +76,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SignUpRequest'
+            example:
+              email: "test@example.com"
+              password: "SecurePass123!"
+              display_name: "テストユーザー"
+              timezone: "Asia/Tokyo"
       responses:
         '201':
           description: 登録成功
@@ -64,6 +88,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+              example:
+                message: "ユーザー登録が完了しました"
+                user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                user:
+                  user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                  email: "test@example.com"
+                  profile:
+                    display_name: "テストユーザー"
+                    timezone: "Asia/Tokyo"
+                  stats:
+                    vitality: 1
+                    intelligence: 1
+                    mental: 1
+                    dexterity: 1
+                    charisma: 1
+                    strength: 1
+                  level: 1
+                  total_exp: 0
+                  current_job_id: "beginner"
         '400':
           $ref: '#/components/responses/BadRequest'
         '409':
@@ -80,6 +123,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SignInRequest'
+            example:
+              email: "test@example.com"
+              password: "SecurePass123!"
       responses:
         '200':
           description: ログイン成功
@@ -87,6 +133,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+              example:
+                access_token: "eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+                refresh_token: "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ..."
+                expires_in: 3600
+                token_type: "Bearer"
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -241,6 +292,41 @@ paths:
                       $ref: '#/components/schemas/Habit'
                   total:
                     type: integer
+              example:
+                habits:
+                  - habit_id: "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+                    user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                    name: "朝のジョギング"
+                    description: "毎朝30分のジョギングをする"
+                    icon: "🏃"
+                    color: "#4CAF50"
+                    category: "exercise"
+                    stat_type: "VIT"
+                    frequency:
+                      type: "daily"
+                    difficulty: "normal"
+                    current_streak: 7
+                    best_streak: 14
+                    total_completions: 45
+                    is_active: true
+                    is_archived: false
+                  - habit_id: "01HRQY6K4MZJP7Y9GF2D5N3B6D"
+                    user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                    name: "筋トレ"
+                    description: "週3回の筋力トレーニング"
+                    icon: "💪"
+                    color: "#FF5722"
+                    category: "workout"
+                    stat_type: "STR"
+                    frequency:
+                      type: "specific_days"
+                      specific_days: [0, 2, 4]
+                    difficulty: "hard"
+                    current_streak: 3
+                    best_streak: 8
+                    is_active: true
+                    is_archived: false
+                total: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -256,6 +342,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/HabitCreateRequest'
+            example:
+              name: "読書"
+              description: "毎日30分の読書"
+              icon: "📚"
+              color: "#2196F3"
+              category: "reading"
+              frequency:
+                type: "daily"
+              difficulty: "normal"
+              reminder_enabled: true
+              reminder_time: "21:00:00"
       responses:
         '201':
           description: 作成成功
@@ -263,6 +360,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Habit'
+              example:
+                habit_id: "01HRQZ7K4MZJP7Y9GF2D5N3B6E"
+                user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                name: "読書"
+                description: "毎日30分の読書"
+                icon: "📚"
+                color: "#2196F3"
+                category: "reading"
+                stat_type: "INT"
+                frequency:
+                  type: "daily"
+                difficulty: "normal"
+                reminder_enabled: true
+                reminder_time: "21:00:00"
+                current_streak: 0
+                best_streak: 0
+                total_completions: 0
+                is_active: true
+                is_archived: false
+                created_at: "2026-01-08T10:00:00.000000"
+                updated_at: "2026-01-08T10:00:00.000000"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -417,6 +535,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/HabitRecordCreateRequest'
+            example:
+              completed_date: "2026-01-08"
+              completed: true
+              note: "朝から気持ちよく走れた！"
       responses:
         '201':
           description: 記録成功
@@ -424,6 +546,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HabitRecordResponse'
+              examples:
+                normal:
+                  summary: 通常の記録
+                  value:
+                    record:
+                      record_id: "01HRR15K4MZJP7Y9GF2D5N3B6F"
+                      habit_id: "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+                      user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                      completed_date: "2026-01-08"
+                      completed: true
+                      note: "朝から気持ちよく走れた！"
+                      exp_earned: 12
+                      streak_at_completion: 8
+                    exp_gained: 12
+                    new_streak: 8
+                    level_up: false
+                    stat_level_up: false
+                    stat_type: "VIT"
+                    new_achievements: []
+                    new_jobs: []
+                with_achievement:
+                  summary: アチーブメント解除
+                  value:
+                    record:
+                      record_id: "01HRR15K4MZJP7Y9GF2D5N3B6F"
+                      habit_id: "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+                      user_id: "01HRQX8K4MZJP7Y9GF2D5N3B6C"
+                      completed_date: "2026-01-08"
+                      completed: true
+                      note: "7日連続達成！"
+                      exp_earned: 12
+                      streak_at_completion: 7
+                    exp_gained: 12
+                    new_streak: 7
+                    level_up: true
+                    new_level: 9
+                    stat_level_up: true
+                    new_stat_level: 6
+                    stat_type: "VIT"
+                    new_achievements:
+                      - achievement_id: "streak_7"
+                        name: "一週間の習慣"
+                        description: "7日連続で習慣を達成する"
+                        icon: "🔥"
+                        type: "streak"
+                        rarity: "uncommon"
+                        exp_reward: 100
+                    new_jobs: []
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -498,6 +668,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TodayRecordsResponse'
+              example:
+                date: "2026-01-08"
+                habits:
+                  - habit:
+                      habit_id: "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+                      name: "朝のジョギング"
+                      icon: "🏃"
+                      category: "exercise"
+                    record:
+                      record_id: "01HRR15K4MZJP7Y9GF2D5N3B6F"
+                      completed: true
+                      exp_earned: 12
+                    is_due_today: true
+                  - habit:
+                      habit_id: "01HRQZ7K4MZJP7Y9GF2D5N3B6E"
+                      name: "読書"
+                      icon: "📚"
+                      category: "reading"
+                    record: null
+                    is_due_today: true
+                completed_count: 1
+                total_due: 2
+                completion_rate: 0.5
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -610,6 +803,51 @@ paths:
                     type: integer
                   total_count:
                     type: integer
+              example:
+                achievements:
+                  - achievement_id: "first_habit"
+                    achievement:
+                      achievement_id: "first_habit"
+                      name: "最初の習慣"
+                      description: "最初の習慣を作成する"
+                      icon: "🎉"
+                      type: "first"
+                      rarity: "common"
+                      exp_reward: 20
+                    is_unlocked: true
+                    unlocked_at: "2026-01-01T00:00:00.000000"
+                    current_value: 1
+                    target_value: 1
+                    progress_percent: 100.0
+                  - achievement_id: "streak_7"
+                    achievement:
+                      achievement_id: "streak_7"
+                      name: "一週間の習慣"
+                      description: "7日連続で習慣を達成する"
+                      icon: "🔥"
+                      type: "streak"
+                      rarity: "uncommon"
+                      exp_reward: 100
+                    is_unlocked: true
+                    unlocked_at: "2026-01-08T06:35:00.000000"
+                    current_value: 7
+                    target_value: 7
+                    progress_percent: 100.0
+                  - achievement_id: "streak_30"
+                    achievement:
+                      achievement_id: "streak_30"
+                      name: "月間マスター"
+                      description: "30日連続で習慣を達成する"
+                      icon: "🔥"
+                      type: "streak"
+                      rarity: "rare"
+                      exp_reward: 500
+                    is_unlocked: false
+                    current_value: 7
+                    target_value: 30
+                    progress_percent: 23.3
+                unlocked_count: 2
+                total_count: 3
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -669,6 +907,46 @@ paths:
                     type: integer
                   total_count:
                     type: integer
+              example:
+                jobs:
+                  - job_id: "beginner"
+                    job:
+                      job_id: "beginner"
+                      name: "ビギナー"
+                      description: "すべての冒険者の始まり"
+                      icon: "🌱"
+                      tier: "novice"
+                      requirements: {}
+                      stat_bonuses: {}
+                      exp_bonus: 1.0
+                    is_unlocked: true
+                    is_equipped: false
+                    unlocked_at: "2026-01-01T00:00:00.000000"
+                  - job_id: "warrior_apprentice"
+                    job:
+                      job_id: "warrior_apprentice"
+                      name: "見習い戦士"
+                      description: "筋力を鍛える者"
+                      icon: "⚔️"
+                      tier: "apprentice"
+                      requirements:
+                        stats:
+                          STR: 5
+                      stat_bonuses:
+                        STR: 1
+                      exp_bonus: 1.05
+                    is_unlocked: true
+                    is_equipped: true
+                    unlocked_at: "2026-01-05T10:00:00.000000"
+                    requirements_met:
+                      stat_STR: true
+                    progress_details:
+                      stats:
+                        STR:
+                          current: 6
+                          required: 5
+                unlocked_count: 2
+                total_count: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
 

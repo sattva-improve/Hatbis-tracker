@@ -268,6 +268,19 @@ cdk destroy --all
 
 MIT License
 
+## 📚 ドキュメント
+
+詳細なドキュメントは `docs/` ディレクトリにあります：
+
+| ドキュメント | 説明 |
+|-------------|------|
+| [docs/index.md](docs/index.md) | ドキュメント一覧 |
+| [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | 全APIの詳細リファレンス |
+| [docs/openapi.yaml](docs/openapi.yaml) | OpenAPI 3.0 仕様書 |
+| [docs/GAMIFICATION.md](docs/GAMIFICATION.md) | ゲーミフィケーションシステム設計書 |
+| [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) | ローカル開発環境ガイド |
+| [docs/aws-deployment.md](docs/aws-deployment.md) | AWSデプロイガイド |
+
 ## 🤝 コントリビューション
 
 Issue や Pull Request を歓迎します！

@@ -1,0 +1,1023 @@
+{
+  "auth_signup": {
+    "endpoint": "POST /auth/signup",
+    "description": "ユーザー登録",
+    "request": {
+      "body": {
+        "email": "test@example.com",
+        "password": "SecurePass123!",
+        "display_name": "テストユーザー",
+        "timezone": "Asia/Tokyo"
+      }
+    },
+    "response_201": {
+      "statusCode": 201,
+      "body": {
+        "message": "ユーザー登録が完了しました",
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "user": {
+          "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+          "email": "test@example.com",
+          "profile": {
+            "display_name": "テストユーザー",
+            "avatar_url": null,
+            "bio": null,
+            "timezone": "Asia/Tokyo"
+          },
+          "stats": {
+            "vitality": 1,
+            "intelligence": 1,
+            "mental": 1,
+            "dexterity": 1,
+            "charisma": 1,
+            "strength": 1,
+            "vitality_exp": 0,
+            "intelligence_exp": 0,
+            "mental_exp": 0,
+            "dexterity_exp": 0,
+            "charisma_exp": 0,
+            "strength_exp": 0
+          },
+          "level": 1,
+          "total_exp": 0,
+          "current_job_id": "beginner",
+          "max_streak": 0,
+          "current_streak": 0,
+          "created_at": "2026-01-08T10:00:00.000000",
+          "updated_at": "2026-01-08T10:00:00.000000",
+          "last_login_at": null
+        }
+      }
+    },
+    "response_400": {
+      "statusCode": 400,
+      "body": {
+        "code": "MISSING_FIELDS",
+        "message": "email, password, display_name は必須です"
+      }
+    },
+    "response_409": {
+      "statusCode": 409,
+      "body": {
+        "code": "USER_EXISTS",
+        "message": "このメールアドレスは既に登録されています"
+      }
+    }
+  },
+  "auth_signin": {
+    "endpoint": "POST /auth/signin",
+    "description": "ログイン",
+    "request": {
+      "body": {
+        "email": "test@example.com",
+        "password": "SecurePass123!"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "access_token": "eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ...",
+        "refresh_token": "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ...",
+        "expires_in": 3600,
+        "token_type": "Bearer"
+      }
+    },
+    "response_401": {
+      "statusCode": 401,
+      "body": {
+        "code": "INVALID_CREDENTIALS",
+        "message": "メールアドレスまたはパスワードが間違っています"
+      }
+    }
+  },
+  "auth_refresh": {
+    "endpoint": "POST /auth/refresh",
+    "description": "トークンリフレッシュ",
+    "request": {
+      "body": {
+        "refresh_token": "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ..."
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "access_token": "eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ...",
+        "expires_in": 3600,
+        "token_type": "Bearer"
+      }
+    }
+  },
+  "auth_signout": {
+    "endpoint": "POST /auth/signout",
+    "description": "ログアウト",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      }
+    },
+    "response_204": {
+      "statusCode": 204,
+      "body": null
+    }
+  },
+  "auth_change_password": {
+    "endpoint": "POST /auth/change-password",
+    "description": "パスワード変更",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "body": {
+        "old_password": "OldSecurePass123!",
+        "new_password": "NewSecurePass456!"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "message": "パスワードを変更しました"
+      }
+    }
+  },
+  "users_get_profile": {
+    "endpoint": "GET /users/me",
+    "description": "自分のプロフィール取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "email": "test@example.com",
+        "profile": {
+          "display_name": "テストユーザー",
+          "avatar_url": "https://example.com/avatar.png",
+          "bio": "習慣化を頑張っています！",
+          "timezone": "Asia/Tokyo"
+        },
+        "stats": {
+          "vitality": 5,
+          "intelligence": 3,
+          "mental": 4,
+          "dexterity": 2,
+          "charisma": 2,
+          "strength": 6,
+          "vitality_exp": 450,
+          "intelligence_exp": 200,
+          "mental_exp": 350,
+          "dexterity_exp": 100,
+          "charisma_exp": 100,
+          "strength_exp": 550
+        },
+        "level": 8,
+        "total_exp": 1750,
+        "current_job_id": "warrior_apprentice",
+        "max_streak": 14,
+        "current_streak": 7,
+        "created_at": "2026-01-01T00:00:00.000000",
+        "updated_at": "2026-01-08T10:00:00.000000",
+        "last_login_at": "2026-01-08T09:00:00.000000"
+      }
+    }
+  },
+  "users_update_profile": {
+    "endpoint": "PUT /users/me",
+    "description": "プロフィール更新",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "body": {
+        "display_name": "新しい名前",
+        "avatar_url": "https://example.com/new-avatar.png",
+        "bio": "更新した自己紹介文です"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "email": "test@example.com",
+        "profile": {
+          "display_name": "新しい名前",
+          "avatar_url": "https://example.com/new-avatar.png",
+          "bio": "更新した自己紹介文です",
+          "timezone": "Asia/Tokyo"
+        },
+        "stats": {
+          "vitality": 5,
+          "intelligence": 3,
+          "mental": 4,
+          "dexterity": 2,
+          "charisma": 2,
+          "strength": 6,
+          "vitality_exp": 450,
+          "intelligence_exp": 200,
+          "mental_exp": 350,
+          "dexterity_exp": 100,
+          "charisma_exp": 100,
+          "strength_exp": 550
+        },
+        "level": 8,
+        "total_exp": 1750,
+        "current_job_id": "warrior_apprentice",
+        "max_streak": 14,
+        "current_streak": 7,
+        "created_at": "2026-01-01T00:00:00.000000",
+        "updated_at": "2026-01-08T10:05:00.000000",
+        "last_login_at": "2026-01-08T09:00:00.000000"
+      }
+    }
+  },
+  "users_get_stats": {
+    "endpoint": "GET /users/me/stats",
+    "description": "自分のステータス詳細取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "vitality": 5,
+        "vitality_exp": 450,
+        "vitality_next_level_exp": 113,
+        "intelligence": 3,
+        "intelligence_exp": 200,
+        "intelligence_next_level_exp": 50,
+        "mental": 4,
+        "mental_exp": 350,
+        "mental_next_level_exp": 88,
+        "dexterity": 2,
+        "dexterity_exp": 100,
+        "dexterity_next_level_exp": 50,
+        "charisma": 2,
+        "charisma_exp": 100,
+        "charisma_next_level_exp": 50,
+        "strength": 6,
+        "strength_exp": 550,
+        "strength_next_level_exp": 269
+      }
+    }
+  },
+  "habits_list": {
+    "endpoint": "GET /habits",
+    "description": "習慣一覧取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "query_params": {
+        "category": "exercise",
+        "is_active": "true",
+        "is_archived": "false"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "habits": [
+          {
+            "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+            "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+            "name": "朝のジョギング",
+            "description": "毎朝30分のジョギングをする",
+            "icon": "🏃",
+            "color": "#4CAF50",
+            "category": "exercise",
+            "stat_type": "VIT",
+            "frequency": {
+              "type": "daily",
+              "times_per_week": null,
+              "specific_days": null
+            },
+            "difficulty": "normal",
+            "reminder_enabled": true,
+            "reminder_time": "06:30:00",
+            "current_streak": 7,
+            "best_streak": 14,
+            "total_completions": 45,
+            "is_active": true,
+            "is_archived": false,
+            "created_at": "2026-01-01T00:00:00.000000",
+            "updated_at": "2026-01-08T06:35:00.000000",
+            "last_completed_at": "2026-01-08T06:35:00.000000"
+          },
+          {
+            "habit_id": "01HRQY6K4MZJP7Y9GF2D5N3B6D",
+            "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+            "name": "筋トレ",
+            "description": "週3回の筋力トレーニング",
+            "icon": "💪",
+            "color": "#FF5722",
+            "category": "workout",
+            "stat_type": "STR",
+            "frequency": {
+              "type": "specific_days",
+              "times_per_week": null,
+              "specific_days": [
+                0,
+                2,
+                4
+              ]
+            },
+            "difficulty": "hard",
+            "reminder_enabled": true,
+            "reminder_time": "19:00:00",
+            "current_streak": 3,
+            "best_streak": 8,
+            "total_completions": 24,
+            "is_active": true,
+            "is_archived": false,
+            "created_at": "2026-01-01T00:00:00.000000",
+            "updated_at": "2026-01-06T19:30:00.000000",
+            "last_completed_at": "2026-01-06T19:30:00.000000"
+          }
+        ],
+        "total": 2
+      }
+    }
+  },
+  "habits_create": {
+    "endpoint": "POST /habits",
+    "description": "習慣作成",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "body": {
+        "name": "読書",
+        "description": "毎日30分の読書",
+        "icon": "📚",
+        "color": "#2196F3",
+        "category": "reading",
+        "frequency": {
+          "type": "daily"
+        },
+        "difficulty": "normal",
+        "reminder_enabled": true,
+        "reminder_time": "21:00:00"
+      }
+    },
+    "response_201": {
+      "statusCode": 201,
+      "body": {
+        "habit_id": "01HRQZ7K4MZJP7Y9GF2D5N3B6E",
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "name": "読書",
+        "description": "毎日30分の読書",
+        "icon": "📚",
+        "color": "#2196F3",
+        "category": "reading",
+        "stat_type": "INT",
+        "frequency": {
+          "type": "daily",
+          "times_per_week": null,
+          "specific_days": null
+        },
+        "difficulty": "normal",
+        "reminder_enabled": true,
+        "reminder_time": "21:00:00",
+        "current_streak": 0,
+        "best_streak": 0,
+        "total_completions": 0,
+        "is_active": true,
+        "is_archived": false,
+        "created_at": "2026-01-08T10:00:00.000000",
+        "updated_at": "2026-01-08T10:00:00.000000",
+        "last_completed_at": null
+      }
+    }
+  },
+  "habits_get": {
+    "endpoint": "GET /habits/{habitId}",
+    "description": "習慣詳細取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "habitId": "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "name": "朝のジョギング",
+        "description": "毎朝30分のジョギングをする",
+        "icon": "🏃",
+        "color": "#4CAF50",
+        "category": "exercise",
+        "stat_type": "VIT",
+        "frequency": {
+          "type": "daily",
+          "times_per_week": null,
+          "specific_days": null
+        },
+        "difficulty": "normal",
+        "reminder_enabled": true,
+        "reminder_time": "06:30:00",
+        "current_streak": 7,
+        "best_streak": 14,
+        "total_completions": 45,
+        "is_active": true,
+        "is_archived": false,
+        "created_at": "2026-01-01T00:00:00.000000",
+        "updated_at": "2026-01-08T06:35:00.000000",
+        "last_completed_at": "2026-01-08T06:35:00.000000"
+      }
+    },
+    "response_404": {
+      "statusCode": 404,
+      "body": {
+        "code": "HABIT_NOT_FOUND",
+        "message": "習慣が見つかりません"
+      }
+    }
+  },
+  "habits_update": {
+    "endpoint": "PUT /habits/{habitId}",
+    "description": "習慣更新",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "habitId": "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+      },
+      "body": {
+        "name": "朝のジョギング（更新）",
+        "description": "毎朝45分のジョギングをする",
+        "difficulty": "hard"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "name": "朝のジョギング（更新）",
+        "description": "毎朝45分のジョギングをする",
+        "icon": "🏃",
+        "color": "#4CAF50",
+        "category": "exercise",
+        "stat_type": "VIT",
+        "frequency": {
+          "type": "daily",
+          "times_per_week": null,
+          "specific_days": null
+        },
+        "difficulty": "hard",
+        "reminder_enabled": true,
+        "reminder_time": "06:30:00",
+        "current_streak": 7,
+        "best_streak": 14,
+        "total_completions": 45,
+        "is_active": true,
+        "is_archived": false,
+        "created_at": "2026-01-01T00:00:00.000000",
+        "updated_at": "2026-01-08T10:10:00.000000",
+        "last_completed_at": "2026-01-08T06:35:00.000000"
+      }
+    }
+  },
+  "habits_delete": {
+    "endpoint": "DELETE /habits/{habitId}",
+    "description": "習慣削除",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "habitId": "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+      }
+    },
+    "response_204": {
+      "statusCode": 204,
+      "body": null
+    }
+  },
+  "habits_archive": {
+    "endpoint": "POST /habits/{habitId}/archive",
+    "description": "習慣アーカイブ",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "habitId": "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "name": "朝のジョギング",
+        "description": "毎朝30分のジョギングをする",
+        "icon": "🏃",
+        "color": "#4CAF50",
+        "category": "exercise",
+        "stat_type": "VIT",
+        "frequency": {
+          "type": "daily",
+          "times_per_week": null,
+          "specific_days": null
+        },
+        "difficulty": "normal",
+        "reminder_enabled": true,
+        "reminder_time": "06:30:00",
+        "current_streak": 7,
+        "best_streak": 14,
+        "total_completions": 45,
+        "is_active": false,
+        "is_archived": true,
+        "created_at": "2026-01-01T00:00:00.000000",
+        "updated_at": "2026-01-08T10:15:00.000000",
+        "last_completed_at": "2026-01-08T06:35:00.000000"
+      }
+    }
+  },
+  "records_list": {
+    "endpoint": "GET /habits/{habitId}/records",
+    "description": "習慣記録一覧取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "habitId": "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+      },
+      "query_params": {
+        "start_date": "2026-01-01",
+        "end_date": "2026-01-08"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "records": [
+          {
+            "record_id": "01HRR15K4MZJP7Y9GF2D5N3B6F",
+            "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+            "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+            "completed_date": "2026-01-08",
+            "completed": true,
+            "note": "今日も頑張った！",
+            "exp_earned": 12,
+            "streak_at_completion": 7,
+            "created_at": "2026-01-08T06:35:00.000000"
+          },
+          {
+            "record_id": "01HRR14K4MZJP7Y9GF2D5N3B6G",
+            "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+            "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+            "completed_date": "2026-01-07",
+            "completed": true,
+            "note": null,
+            "exp_earned": 12,
+            "streak_at_completion": 6,
+            "created_at": "2026-01-07T06:40:00.000000"
+          }
+        ],
+        "total": 2
+      }
+    }
+  },
+  "records_create": {
+    "endpoint": "POST /habits/{habitId}/records",
+    "description": "習慣記録作成（達成報告）",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "habitId": "01HRQY5K4MZJP7Y9GF2D5N3B6C"
+      },
+      "body": {
+        "completed_date": "2026-01-08",
+        "completed": true,
+        "note": "朝から気持ちよく走れた！"
+      }
+    },
+    "response_201": {
+      "statusCode": 201,
+      "body": {
+        "record": {
+          "record_id": "01HRR15K4MZJP7Y9GF2D5N3B6F",
+          "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+          "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+          "completed_date": "2026-01-08",
+          "completed": true,
+          "note": "朝から気持ちよく走れた！",
+          "exp_earned": 12,
+          "streak_at_completion": 8,
+          "created_at": "2026-01-08T06:35:00.000000"
+        },
+        "exp_gained": 12,
+        "new_streak": 8,
+        "level_up": false,
+        "new_level": null,
+        "stat_level_up": false,
+        "new_stat_level": null,
+        "stat_type": "VIT",
+        "new_achievements": [],
+        "new_jobs": []
+      }
+    },
+    "response_201_with_achievements": {
+      "statusCode": 201,
+      "body": {
+        "record": {
+          "record_id": "01HRR15K4MZJP7Y9GF2D5N3B6F",
+          "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+          "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+          "completed_date": "2026-01-08",
+          "completed": true,
+          "note": "7日連続達成！",
+          "exp_earned": 12,
+          "streak_at_completion": 7,
+          "created_at": "2026-01-08T06:35:00.000000"
+        },
+        "exp_gained": 12,
+        "new_streak": 7,
+        "level_up": true,
+        "new_level": 9,
+        "stat_level_up": true,
+        "new_stat_level": 6,
+        "stat_type": "VIT",
+        "new_achievements": [
+          {
+            "achievement_id": "streak_7",
+            "name": "一週間の習慣",
+            "description": "7日連続で習慣を達成する",
+            "icon": "🔥",
+            "type": "streak",
+            "rarity": "uncommon",
+            "exp_reward": 100
+          }
+        ],
+        "new_jobs": []
+      }
+    }
+  },
+  "records_today": {
+    "endpoint": "GET /records/today",
+    "description": "今日の達成状況取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "date": "2026-01-08",
+        "habits": [
+          {
+            "habit": {
+              "habit_id": "01HRQY5K4MZJP7Y9GF2D5N3B6C",
+              "name": "朝のジョギング",
+              "icon": "🏃",
+              "category": "exercise"
+            },
+            "record": {
+              "record_id": "01HRR15K4MZJP7Y9GF2D5N3B6F",
+              "completed": true,
+              "exp_earned": 12
+            },
+            "is_due_today": true
+          },
+          {
+            "habit": {
+              "habit_id": "01HRQZ7K4MZJP7Y9GF2D5N3B6E",
+              "name": "読書",
+              "icon": "📚",
+              "category": "reading"
+            },
+            "record": null,
+            "is_due_today": true
+          }
+        ],
+        "completed_count": 1,
+        "total_due": 2,
+        "completion_rate": 0.5
+      }
+    }
+  },
+  "stats_daily": {
+    "endpoint": "GET /stats/daily",
+    "description": "日次統計取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "query_params": {
+        "date": "2026-01-08"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "date": "2026-01-08",
+        "total_habits": 3,
+        "completed_habits": 2,
+        "completion_rate": 0.67,
+        "total_exp_earned": 27
+      }
+    }
+  },
+  "stats_weekly": {
+    "endpoint": "GET /stats/weekly",
+    "description": "週次統計取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "query_params": {
+        "week_start": "2026-01-06"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "week_start": "2026-01-06",
+        "week_end": "2026-01-12",
+        "total_habits": 21,
+        "completed_habits": 18,
+        "completion_rate": 0.86,
+        "total_exp_earned": 198,
+        "daily_stats": [
+          {
+            "date": "2026-01-06",
+            "total_habits": 3,
+            "completed_habits": 3,
+            "completion_rate": 1.0,
+            "total_exp_earned": 30
+          },
+          {
+            "date": "2026-01-07",
+            "total_habits": 3,
+            "completed_habits": 3,
+            "completion_rate": 1.0,
+            "total_exp_earned": 30
+          },
+          {
+            "date": "2026-01-08",
+            "total_habits": 3,
+            "completed_habits": 2,
+            "completion_rate": 0.67,
+            "total_exp_earned": 27
+          }
+        ]
+      }
+    }
+  },
+  "stats_monthly": {
+    "endpoint": "GET /stats/monthly",
+    "description": "月次統計取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "query_params": {
+        "year": "2026",
+        "month": "1"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "year": 2026,
+        "month": 1,
+        "total_habits": 93,
+        "completed_habits": 82,
+        "completion_rate": 0.88,
+        "total_exp_earned": 984
+      }
+    }
+  },
+  "achievements_list": {
+    "endpoint": "GET /achievements",
+    "description": "アチーブメント一覧取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "query_params": {
+        "include_locked": "true"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "achievements": [
+          {
+            "achievement_id": "first_habit",
+            "achievement": {
+              "achievement_id": "first_habit",
+              "name": "最初の習慣",
+              "description": "最初の習慣を作成する",
+              "icon": "🎉",
+              "type": "first",
+              "rarity": "common",
+              "condition": {
+                "type": "first_habit"
+              },
+              "exp_reward": 20,
+              "is_hidden": false,
+              "sort_order": 0
+            },
+            "is_unlocked": true,
+            "unlocked_at": "2026-01-01T00:00:00.000000",
+            "current_value": 1,
+            "target_value": 1,
+            "progress_percent": 100.0
+          },
+          {
+            "achievement_id": "streak_7",
+            "achievement": {
+              "achievement_id": "streak_7",
+              "name": "一週間の習慣",
+              "description": "7日連続で習慣を達成する",
+              "icon": "🔥",
+              "type": "streak",
+              "rarity": "uncommon",
+              "condition": {
+                "type": "streak",
+                "days": 7
+              },
+              "exp_reward": 100,
+              "is_hidden": false,
+              "sort_order": 1
+            },
+            "is_unlocked": true,
+            "unlocked_at": "2026-01-08T06:35:00.000000",
+            "current_value": 7,
+            "target_value": 7,
+            "progress_percent": 100.0
+          },
+          {
+            "achievement_id": "streak_30",
+            "achievement": {
+              "achievement_id": "streak_30",
+              "name": "月間マスター",
+              "description": "30日連続で習慣を達成する",
+              "icon": "🔥",
+              "type": "streak",
+              "rarity": "rare",
+              "condition": {
+                "type": "streak",
+                "days": 30
+              },
+              "exp_reward": 500,
+              "is_hidden": false,
+              "sort_order": 2
+            },
+            "is_unlocked": false,
+            "unlocked_at": null,
+            "current_value": 7,
+            "target_value": 30,
+            "progress_percent": 23.3
+          }
+        ],
+        "unlocked_count": 2,
+        "total_count": 3
+      }
+    }
+  },
+  "jobs_list": {
+    "endpoint": "GET /jobs",
+    "description": "ジョブ一覧取得",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "query_params": {
+        "include_locked": "true"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "jobs": [
+          {
+            "job_id": "beginner",
+            "job": {
+              "job_id": "beginner",
+              "name": "ビギナー",
+              "description": "すべての冒険者の始まり",
+              "icon": "🌱",
+              "tier": "novice",
+              "requirements": {},
+              "stat_bonuses": {},
+              "exp_bonus": 1.0,
+              "sort_order": 0
+            },
+            "is_unlocked": true,
+            "is_equipped": false,
+            "unlocked_at": "2026-01-01T00:00:00.000000",
+            "requirements_met": {},
+            "progress_details": {}
+          },
+          {
+            "job_id": "warrior_apprentice",
+            "job": {
+              "job_id": "warrior_apprentice",
+              "name": "見習い戦士",
+              "description": "筋力を鍛える者",
+              "icon": "⚔️",
+              "tier": "apprentice",
+              "requirements": {
+                "stats": {
+                  "STR": 5
+                }
+              },
+              "stat_bonuses": {
+                "STR": 1
+              },
+              "exp_bonus": 1.05,
+              "sort_order": 10
+            },
+            "is_unlocked": true,
+            "is_equipped": true,
+            "unlocked_at": "2026-01-05T10:00:00.000000",
+            "requirements_met": {
+              "stat_STR": true
+            },
+            "progress_details": {
+              "stats": {
+                "STR": {
+                  "current": 6,
+                  "required": 5
+                }
+              }
+            }
+          }
+        ],
+        "unlocked_count": 2,
+        "total_count": 2
+      }
+    }
+  },
+  "jobs_equip": {
+    "endpoint": "POST /jobs/{jobId}/equip",
+    "description": "ジョブ装備",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer eyJraWQiOiJhYmNkZWYxMjM0NTY3ODkwIiwiYWxnIjoiUlMyNTYifQ..."
+      },
+      "path_params": {
+        "jobId": "warrior_apprentice"
+      }
+    },
+    "response_200": {
+      "statusCode": 200,
+      "body": {
+        "user_id": "01HRQX8K4MZJP7Y9GF2D5N3B6C",
+        "email": "test@example.com",
+        "profile": {
+          "display_name": "テストユーザー",
+          "avatar_url": null,
+          "bio": null,
+          "timezone": "Asia/Tokyo"
+        },
+        "stats": {
+          "vitality": 5,
+          "intelligence": 3,
+          "mental": 4,
+          "dexterity": 2,
+          "charisma": 2,
+          "strength": 6,
+          "vitality_exp": 450,
+          "intelligence_exp": 200,
+          "mental_exp": 350,
+          "dexterity_exp": 100,
+          "charisma_exp": 100,
+          "strength_exp": 550
+        },
+        "level": 8,
+        "total_exp": 1750,
+        "current_job_id": "warrior_apprentice",
+        "max_streak": 14,
+        "current_streak": 7,
+        "created_at": "2026-01-01T00:00:00.000000",
+        "updated_at": "2026-01-08T10:20:00.000000",
+        "last_login_at": "2026-01-08T09:00:00.000000"
+      }
+    },
+    "response_400": {
+      "statusCode": 400,
+      "body": {
+        "code": "CANNOT_EQUIP",
+        "message": "Job is not unlocked"
+      }
+    }
+  }
+}
