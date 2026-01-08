@@ -495,10 +495,10 @@ DEFAULT_JOBS = [
     
     # Apprentice (VIT系)
     {
-        "job_id": "athlete_apprentice",
-        "name": "見習いアスリート",
-        "description": "健康的な体を目指す者",
-        "icon": "🏃",
+        "job_id": "fighter_apprentice",
+        "name": "見習い格闘家",
+        "description": "体力を鍛える者",
+        "icon": "🥊",
         "tier": "apprentice",
         "requirements": {"stats": {"VIT": 5}},
         "stat_bonuses": {"VIT": 1},
@@ -573,13 +573,13 @@ DEFAULT_JOBS = [
     
     # Journeyman (VIT系)
     {
-        "job_id": "athlete",
-        "name": "アスリート",
-        "description": "健康的な体を手に入れた者",
-        "icon": "🏆",
+        "job_id": "fighter",
+        "name": "格闘家",
+        "description": "肉体を極めし者",
+        "icon": "🥋",
         "tier": "journeyman",
-        "requirements": {"stats": {"VIT": 10}},
-        "stat_bonuses": {"VIT": 2},
+        "requirements": {"stats": {"VIT": 15, "STR": 10}},
+        "stat_bonuses": {"VIT": 2, "STR": 1},
         "exp_bonus": 1.10,
         "sort_order": 20
     },
@@ -676,6 +676,22 @@ DEFAULT_JOBS = [
         },
         "exp_bonus": 1.20,
         "sort_order": 30
+    },
+    
+    # Expert (VIT系)
+    {
+        "job_id": "martial_artist",
+        "name": "武闘家",
+        "description": "肉体の極致に達した格闘の達人",
+        "icon": "🥷",
+        "tier": "expert",
+        "requirements": {
+            "stats": {"VIT": 30, "STR": 25},
+            "achievements": ["streak_30"]
+        },
+        "stat_bonuses": {"VIT": 3, "STR": 2},
+        "exp_bonus": 1.20,
+        "sort_order": 31
     },
     
     # Master (特殊)

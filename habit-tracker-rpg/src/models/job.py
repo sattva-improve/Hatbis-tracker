@@ -139,10 +139,10 @@ PREDEFINED_JOBS = [
         sort_order=12,
     ),
     Job(
-        job_id="athlete_apprentice",
-        name="見習いアスリート",
+        job_id="fighter_apprentice",
+        name="見習い格闘家",
         description="体力を鍛える者",
-        icon="🏃",
+        icon="🥊",
         tier=JobTier.APPRENTICE,
         requirements={"stats": {"VIT": 5}},
         stat_bonuses={"VIT": 1},
@@ -206,6 +206,17 @@ PREDEFINED_JOBS = [
         exp_bonus=1.1,
         sort_order=22,
     ),
+    Job(
+        job_id="fighter",
+        name="格闘家",
+        description="肉体を極めし者",
+        icon="🥋",
+        tier=JobTier.JOURNEYMAN,
+        requirements={"stats": {"VIT": 15, "STR": 10}},
+        stat_bonuses={"VIT": 2, "STR": 1},
+        exp_bonus=1.1,
+        sort_order=23,
+    ),
     
     # Expert tier
     Job(
@@ -235,6 +246,20 @@ PREDEFINED_JOBS = [
         stat_bonuses={"INT": 3, "MND": 2},
         exp_bonus=1.2,
         sort_order=31,
+    ),
+    Job(
+        job_id="martial_artist",
+        name="武闘家",
+        description="肉体の極致に達した格闘の達人",
+        icon="🥷",
+        tier=JobTier.EXPERT,
+        requirements={
+            "stats": {"VIT": 30, "STR": 25},
+            "achievements": ["streak_30"]
+        },
+        stat_bonuses={"VIT": 3, "STR": 2},
+        exp_bonus=1.2,
+        sort_order=32,
     ),
     
     # Master tier
